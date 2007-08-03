@@ -1,0 +1,21 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=1978
+
+This script was made to ease typing programming code like:
+
+    int                        someVariable;
+    double                     foo;
+    std::vector< std::string > andSomeLongerName;
+
+(If this doesn't look nicely aligned it's because you're not viewing it using a fixed-width font.)
+
+The attached script allows you to quickly align the variable names on the same (virtual) column. It defines two mappings for this:
+
+  ,a : Align the current cursor to the predefined column.
+  ,A : Try to find the alignment column automatically on the previous line.
+
+(Replace , with your g:mapleader.)
+
+The first mapping actually does want we want to achieve, but the latter makes it really easy to use. It looks for the separating gap, which is \s\s (two consecutive white-space characters), and a single tab (following by anything) as a plan B. This may not always work of course. To specify the column, I hijack one of your mark (c in this case), which you can always set manually. If you don't want mark c to be sacrificed to the script, it's very easy to adapt it and make it use another (by editing the key mappings in the file).
+
+The variable g:align_uses_tabs can be reset if you want the script to only insert spaces. Else, it inserts as many tabs as possible, than "fine-tunes" using spaces.
+
