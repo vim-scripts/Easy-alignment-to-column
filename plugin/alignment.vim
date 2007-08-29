@@ -44,6 +44,11 @@ function! TryDetermineAlignColumn( mark )
 	if l:found == 0
 		let l:found = search( "\\t", 'p', line(".") )
 	endif
+	if l:found == 0 && getline(".")[0] =~ "\\s"
+        " sorry case: align at first non-white space.
+        normal 0
+		let l:found = 1
+	endif
 	if l:found > 0
 		normal w
 		exec "normal m" . a:mark
@@ -75,17 +80,19 @@ function! AlignToMark( markchar )
 		endif
 	endwhile
 	" insert tabs until we jump past (or spot on) our goal
-	while g:align_uses_tabs && l:toinsert > 0
-		" that is i + a tab
-		normal i	
-		normal l
-		let l:toinsert = l:togoto - virtcol(".")
-	endwhile
-	if l:toinsert < 0
-		" undo last tab
-		normal hx
-		let l:toinsert = l:togoto - virtcol(".")
-	endif
+    if !&et && g:align_uses_tabs
+        while l:toinsert > 0
+            " that is i + a tab
+            normal i	
+            normal l
+            let l:toinsert = l:togoto - virtcol(".")
+        endwhile
+        if l:toinsert < 0
+            " undo last tab
+            normal hx
+            let l:toinsert = l:togoto - virtcol(".")
+        endif
+    endif
 	" then fine-tune using spaces
 	while l:toinsert > 0
 		" that is i + a space
@@ -93,10 +100,8 @@ function! AlignToMark( markchar )
 		normal l
 		let l:toinsert -= 1
 	endwhile
-	"exec "normal ".l:togoto."|"
 	call FancyEcho( "@1Aligned@0 to mark @1".a:markchar."@0 on virtual column @1".l:togoto."@0." )
 	call BlinkColumn( 1 )
 endfunction
-exec "nmap ".g:mapleader."a :call AlignToMark( \"c\" )<CR>"
 
 
